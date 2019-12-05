@@ -1,0 +1,3 @@
+[submodule "mediawiki-services-mobileapps"]
+	path = mediawiki-services-mobileapps
+	url = https://github.com/wikimedia/mediawiki-services-mobileapps.git
