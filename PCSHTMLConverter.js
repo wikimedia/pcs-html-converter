@@ -1,5 +1,28 @@
+require('@babel/polyfill')
+const fetch = require('whatwg-fetch').fetch
 const MobileHTML = require('./mobileapps/lib/mobile/MobileHTML')
 const MobileViewHTML = require('./mobileapps/lib/mobile/MobileViewHTML')
+
+/**
+ * Element.closest() polyfill
+ * https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
+ */
+if (!Element.prototype.matches) {
+    Element.prototype.matches = Element.prototype.msMatchesSelector || 
+                            Element.prototype.webkitMatchesSelector;
+}
+  
+if (!Element.prototype.closest) {
+    Element.prototype.closest = function(s) {
+        var el = this;
+
+        do {
+        if (el.matches(s)) return el;
+        el = el.parentElement || el.parentNode;
+        } while (el !== null && el.nodeType === 1);
+        return null;
+    };
+}
 
 async function convertParsoidDocumentToMobileHTML(doc, metadata = {}) {
     const mobileHTML = await MobileHTML.promise(doc, metadata)
@@ -25,7 +48,32 @@ async function convertMobileViewJSONToMobileHTML(mobileViewJSON, metadata = {}) 
     return await convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
 }
 
+async function testParsoid() {
+    const url = "https://en.wikipedia.org/api/rest_v1/page/html/Dog"
+    const meta = {
+      baseURI: "http://localhost:6927/en.wikipedia.org/v1/"
+    }
+    const response = await fetch(url)
+    const parsoidHTML = await response.text()
+    const mobileHTML = await PCSHTMLConverter.convertParsoidHTMLToMobileHTML(parsoidHTML, meta)
+    return mobileHTML
+}
+
+async function testMobileView() {
+    const url = "https://en.wikipedia.org//w/api.php?action=mobileview&format=json&page=Dog&sections=all&prop=text%7Csections%7Clanguagecount%7Cthumb%7Cimage%7Cid%7Crevision%7Cdescription%7Cnamespace%7Cnormalizedtitle%7Cdisplaytitle%7Cprotection%7Ceditable&sectionprop=toclevel%7Cline%7Canchor&noheadings=1&thumbwidth=1024"
+    const meta = {
+      domain: "en.wikipedia.org",
+      baseURI: "http://localhost:6927/en.wikipedia.org/v1/"
+    }
+    const response = await fetch(url)
+    const mobileViewJSON = await response.json()
+    const mobileHTML = await PCSHTMLConverter.convertMobileViewJSONToMobileHTML(mobileViewJSON, meta)
+    return mobileHTML
+}
+
 module.exports = {
     convertParsoidHTMLToMobileHTML,
-    convertMobileViewJSONToMobileHTML
+    convertMobileViewJSONToMobileHTML,
+    testParsoid,
+    testMobileView
 }

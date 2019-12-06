@@ -1,21 +1,14 @@
 <html>
     <head>
         <script src="build/PCSHTMLConverter.js"></script>
-        <script>
-          async function test() {
-            const url = "https://en.wikipedia.org/api/rest_v1/page/html/Dog"
-            const meta = {
-              baseURI: "http://localhost:6927/en.wikipedia.org/v1/"
-            }
-            const response = await fetch(url)
-            const parsoidHTML = await response.text()
-            const mobileHTML = await PCSHTMLConverter.convertParsoidHTMLToMobileHTML(parsoidHTML, meta)
-            document.getElementById("mobileHTML").innerText = mobileHTML
-          }
-          test()
-        </script>
     </head>
     <body>
         <pre id="mobileHTML"></pre>
+        <script>
+          function handleMobileHTML(mobileHTML) {
+            document.getElementById("mobileHTML").innerText = mobileHTML
+          }
+          PCSHTMLConverter.testParsoid().then(handleMobileHTML)
+        </script>
     </body>
 </html>
