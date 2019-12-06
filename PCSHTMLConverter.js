@@ -4,7 +4,7 @@ const MobileViewHTML = require('./mobileapps/lib/mobile/MobileViewHTML')
 async function convertParsoidDocumentToMobileHTML(doc, metadata = {}) {
     const mobileHTML = await MobileHTML.promise(doc, metadata)
     if (metadata.mw) {
-        mobileHTML.addMediaWikiMedatadata(metadata.mw)
+        mobileHTML.addMediaWikiMetadata(metadata.mw)
     }
     return mobileHTML.doc.documentElement.outerHTML
 }
@@ -25,10 +25,42 @@ async function convertMobileViewJSONToMobileHTML(mobileViewJSON, metadata = {}) 
     return await convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
 }
 
+const mw = {
+    "pageid": 4269567,
+    "ns": 0,
+    "title": "Dog",
+    "contentmodel": "wikitext",
+    "pagelanguage": "en",
+    "pagelanguagehtmlcode": "en",
+    "pagelanguagedir": "ltr",
+    "touched": "2019-12-06T03:48:17Z",
+    "lastrevid": 929485161,
+    "length": 126950,
+    "protection": [
+        {
+            "type": "edit",
+            "level": "autoconfirmed",
+            "expiry": "infinity"
+        },
+        {
+            "type": "move",
+            "level": "sysop",
+            "expiry": "infinity"
+        }
+    ],
+    "restrictiontypes": [
+        "edit",
+        "move"
+    ],
+    "description": "domestic animal",
+    "descriptionsource": "central"
+}
+
 async function testParsoid() {
     const url = "https://en.wikipedia.org/api/rest_v1/page/html/Dog"
     const meta = {
-      baseURI: "http://localhost:6927/en.wikipedia.org/v1/"
+      baseURI: "http://localhost:6927/en.wikipedia.org/v1/",
+      mw
     }
     const response = await fetch(url)
     const parsoidHTML = await response.text()
@@ -40,7 +72,8 @@ async function testMobileView() {
     const url = "https://en.wikipedia.org//w/api.php?action=mobileview&format=json&page=Dog&sections=all&prop=text%7Csections%7Clanguagecount%7Cthumb%7Cimage%7Cid%7Crevision%7Cdescription%7Cnamespace%7Cnormalizedtitle%7Cdisplaytitle%7Cprotection%7Ceditable&sectionprop=toclevel%7Cline%7Canchor&noheadings=1&thumbwidth=1024"
     const meta = {
       domain: "en.wikipedia.org",
-      baseURI: "http://localhost:6927/en.wikipedia.org/v1/"
+      baseURI: "http://localhost:6927/en.wikipedia.org/v1/",
+      mw
     }
     const response = await fetch(url)
     const mobileViewJSON = await response.json()
