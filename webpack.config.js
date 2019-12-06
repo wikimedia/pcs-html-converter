@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
   entry: {
     PCSHTMLConverter: './PCSHTMLConverter.js',
+    Polyfill: './Polyfill.js'
   },
   output: {
     path: path.resolve(__dirname, 'build'),
