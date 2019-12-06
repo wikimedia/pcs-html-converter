@@ -1,16 +1,17 @@
 const MobileHTML = require('./mobileapps/lib/mobile/MobileHTML')
 const MobileViewHTML = require('./mobileapps/lib/mobile/MobileViewHTML')
 
-function convertParsoidHTMLToMobileHTML(parsoidHTML, metadata) {
-    const doc = DOMParser(parsoidHTML)
-    const mobileHTML = MobileHTML(doc, metadata)
-    mobileHTML.workSync()
-    mobileHTML.finalizeSync()
-    mobileHTML.addMediaWikiMedatadata(metadata.mw)
-    return mobileHTML.doc.outerHTML
+async function convertParsoidHTMLToMobileHTML(parsoidHTML, metadata) {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(parsoidHTML, 'text/html')
+    const mobileHTML = await MobileHTML.promise(doc, metadata)
+    if (metadata && metadata.mw) {
+        mobileHTML.addMediaWikiMedatadata(metadata.mw)
+    }
+    return mobileHTML.doc.documentElement.outerHTML
 }
 
-function convertMobileViewToMobileHTML(mobileView, metadata) {
+async function convertMobileViewToMobileHTML(mobileView, metadata) {
 
 }
 
