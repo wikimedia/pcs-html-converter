@@ -55,6 +55,7 @@ const mw = {
     "pageid": 4269567,
     "ns": 0,
     "title": "Dog",
+    "displaytitle": "Dog",
     "contentmodel": "wikitext",
     "pagelanguage": "en",
     "pagelanguagehtmlcode": "en",
