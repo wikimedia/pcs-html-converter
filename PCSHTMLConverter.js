@@ -118,7 +118,7 @@ async function testMobileView() {
     }
     const response = await fetch(url)
     const mobileViewJSON = await response.json()
-    const mobileHTML = await PCSHTMLConverter.convertMobileViewJSONToMobileHTML(mobileViewJSON)
+    const mobileHTML = await PCSHTMLConverter.convertMobileViewJSONToMobileHTML(mobileViewJSON, meta)
     return mobileHTML
 }
 
