@@ -25,6 +25,32 @@ async function convertMobileViewJSONToMobileHTML(mobileViewJSON, metadata = {}) 
     return await convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
 }
 
+async function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON) {
+    function getSectionHTML(section) {
+        return "<section data-mw-section-id=\"" + section.id + "\">" + section.text + "</section>"
+    }
+    function reducer(acc, curr) {
+        return acc + "\n" + getSectionHTML(curr)
+    }
+    const parsoidHTML = remainingJSON.sections.reduce(reducer, getSectionHTML(leadJSON.sections[0]))
+    const meta = {
+        mw: {
+            pageid: leadJSON.id,
+            ns: leadJSON.ns,
+            displaytitle: leadJSON.displaytitle,
+            protection: [],
+            description: leadJSON.description,
+            description_source: leadJSON.description_source
+            
+        }
+    }
+    return await PCSHTMLConverter.convertParsoidHTMLToMobileHTML(parsoidHTML, meta) 
+}
+//  *   {!array} protection
+//  *   {?Object} originalimage
+//  *   {!string} displaytitle
+//  *   {?string} description
+//  *   {?string} description_source
 const mw = {
     "pageid": 4269567,
     "ns": 0,
@@ -53,7 +79,7 @@ const mw = {
         "move"
     ],
     "description": "domestic animal",
-    "descriptionsource": "central"
+    "description_source": "central"
 }
 
 async function testParsoid() {
@@ -68,6 +94,21 @@ async function testParsoid() {
     return mobileHTML
 }
 
+async function testMobileSections() {
+    const leadURL = "https://en.wikipedia.org/api/rest_v1/page/mobile-sections-lead/Dog"
+    const remainingURL = "https://en.wikipedia.org/api/rest_v1/page/mobile-sections-remaining/Dog"
+    const meta = {
+      baseURI: "http://localhost:6927/en.wikipedia.org/v1/",
+      mw
+    }
+    const leadResponse = await fetch(leadURL)
+    const remainingResponse = await fetch(remainingURL)
+    const leadJSON = await leadResponse.json()
+    const remainingJSON = await remainingResponse.json()
+    const mobileHTML = await PCSHTMLConverter.convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, meta)
+    return mobileHTML
+}
+
 async function testMobileView() {
     const url = "https://en.wikipedia.org//w/api.php?action=mobileview&format=json&page=Dog&sections=all&prop=text%7Csections%7Clanguagecount%7Cthumb%7Cimage%7Cid%7Crevision%7Cdescription%7Cnamespace%7Cnormalizedtitle%7Cdisplaytitle%7Cprotection%7Ceditable&sectionprop=toclevel%7Cline%7Canchor&noheadings=1&thumbwidth=1024"
     const meta = {
@@ -77,13 +118,15 @@ async function testMobileView() {
     }
     const response = await fetch(url)
     const mobileViewJSON = await response.json()
-    const mobileHTML = await PCSHTMLConverter.convertMobileViewJSONToMobileHTML(mobileViewJSON, meta)
+    const mobileHTML = await PCSHTMLConverter.convertMobileViewJSONToMobileHTML(mobileViewJSON)
     return mobileHTML
 }
 
 module.exports = {
     convertParsoidHTMLToMobileHTML,
+    convertMobileSectionsJSONToMobileHTML,
     convertMobileViewJSONToMobileHTML,
     testParsoid,
-    testMobileView
+    testMobileView,
+    testMobileSections
 }
