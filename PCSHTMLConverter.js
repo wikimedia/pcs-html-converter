@@ -1,31 +1,33 @@
 const MobileHTML = require('./mobileapps/lib/mobile/MobileHTML')
 const MobileViewHTML = require('./mobileapps/lib/mobile/MobileViewHTML')
 
-async function convertParsoidDocumentToMobileHTML(doc, metadata = {}) {
-    const mobileHTML = await MobileHTML.promise(doc, metadata)
+function convertParsoidDocumentToMobileHTML(doc, metadata = {}) {
+    const mobileHTML = new MobileHTML(doc, metadata)
+    mobileHTML.workSync()
+    mobileHTML.finalizeSync()
     if (metadata.mw) {
         mobileHTML.addMediaWikiMetadata(metadata.mw)
     }
     return mobileHTML.doc.documentElement.outerHTML
 }
 
-async function convertParsoidHTMLToMobileHTML(parsoidHTML, metadata = {}) {
+function convertParsoidHTMLToMobileHTML(parsoidHTML, metadata = {}) {
     const parser = new DOMParser()
     const doc = parser.parseFromString(parsoidHTML, 'text/html')
-    return await convertParsoidDocumentToMobileHTML(doc, metadata)
+    return convertParsoidDocumentToMobileHTML(doc, metadata)
 }
 
-async function convertMobileViewJSONToMobileHTML(mobileViewJSON, metadata = {}) {
+function convertMobileViewJSONToMobileHTML(mobileViewJSON, metadata = {}) {
     const parser = new DOMParser()
     const doc = parser.parseFromString('<html><head><meta charset="utf-8"><title></title></head><body></body></html>', 'text/html')
     const mobileView = mobileViewJSON.mobileview
     // for some reason this is expected in both the param and in the metadata obj
     metadata.mobileview = mobileView
     const parsoidDocument = MobileViewHTML.convertToParsoidDocument(doc, mobileView, metadata)
-    return await convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
+    return convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
 }
 
-async function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON) {
+function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON) {
     function getSectionHTML(section) {
         return "<section data-mw-section-id=\"" + section.id + "\">" + section.text + "</section>"
     }
@@ -44,7 +46,7 @@ async function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON) {
 
         }
     }
-    return await PCSHTMLConverter.convertParsoidHTMLToMobileHTML(parsoidHTML, meta)
+    return convertParsoidHTMLToMobileHTML(parsoidHTML, meta)
 }
 //  *   {!array} protection
 //  *   {?Object} originalimage
@@ -91,7 +93,7 @@ async function testParsoid() {
     }
     const response = await fetch(url)
     const parsoidHTML = await response.text()
-    const mobileHTML = await PCSHTMLConverter.convertParsoidHTMLToMobileHTML(parsoidHTML, meta)
+    const mobileHTML = convertParsoidHTMLToMobileHTML(parsoidHTML, meta)
     return mobileHTML
 }
 
@@ -106,7 +108,7 @@ async function testMobileSections() {
     const remainingResponse = await fetch(remainingURL)
     const leadJSON = await leadResponse.json()
     const remainingJSON = await remainingResponse.json()
-    const mobileHTML = await PCSHTMLConverter.convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, meta)
+    const mobileHTML = convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, meta)
     return mobileHTML
 }
 
@@ -119,7 +121,7 @@ async function testMobileView() {
     }
     const response = await fetch(url)
     const mobileViewJSON = await response.json()
-    const mobileHTML = await PCSHTMLConverter.convertMobileViewJSONToMobileHTML(mobileViewJSON, meta)
+    const mobileHTML = convertMobileViewJSONToMobileHTML(mobileViewJSON, meta)
     return mobileHTML
 }
 
