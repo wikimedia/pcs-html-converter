@@ -8,7 +8,8 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: '[name].js',
-    library: '[name]'
+    library: '[name]',
+    devtoolNamespace: 'PCSHTMLConverter'
   },
   devtool: 'source-map',
   module: {
