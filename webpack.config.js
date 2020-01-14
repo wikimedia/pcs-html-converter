@@ -11,7 +11,6 @@ module.exports = {
     library: '[name]',
     devtoolNamespace: 'PCSHTMLConverter'
   },
-  devtool: 'source-map',
   module: {
     rules: [
       {

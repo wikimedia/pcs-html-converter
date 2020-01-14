@@ -5,7 +5,8 @@
   "license": "Apache-2.0",
   "description": "Browser based transformer for the Page Content Service. Convert Parsoid HTML and MobileView HTML to HTML compatible with PCS.",
   "scripts": {
-    "build": "webpack -p"
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development --devtool source-map"
   },
   "dependencies": {
     "@babel/core": "^7.7.4",
