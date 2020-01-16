@@ -17,9 +17,14 @@ function convertParsoidHTMLToMobileHTML(parsoidHTML, metadata = {}) {
     return convertParsoidDocumentToMobileHTML(doc, metadata)
 }
 
-function convertMobileViewJSONToMobileHTML(mobileViewJSON, metadata = {}) {
+function convertMobileViewJSONToMobileHTML(mobileViewJSON, domain, baseURI) {
     const parser = new DOMParser()
     const doc = parser.parseFromString('<html><head><meta charset="utf-8"><title></title></head><body></body></html>', 'text/html')
+    const metadata = {
+      domain,
+      baseURI,
+      mw: mwMetadataFromMobileViewJSON(mobileViewJSON)
+    }
     const mobileView = mobileViewJSON.mobileview
     // for some reason this is expected in both the param and in the metadata obj
     metadata.mobileview = mobileView
@@ -112,16 +117,31 @@ async function testMobileSections() {
     return mobileHTML
 }
 
+function mwMetadataFromMobileViewJSON(mobileViewJSON) {
+  const protectionEntries = Object.entries(mobileViewJSON.mobileview.protection || {})
+  const protection = e => { return { type: e[0], level: e[1][0], expiry: 'infinity' } }
+  const restrictiontype = e => e[0]
+  return {
+    "pageid": mobileViewJSON.mobileview.id,
+    "ns": mobileViewJSON.mobileview.ns,
+    "displaytitle": mobileViewJSON.mobileview.displaytitle,
+    "contentmodel": "wikitext",
+    "touched": mobileViewJSON.mobileview.lastmodified,
+    "lastrevid": mobileViewJSON.mobileview.revision,
+    "description": mobileViewJSON.mobileview.description,
+    "description_source": mobileViewJSON.mobileview.descriptionsource,
+    "protection": protectionEntries.map(protection),
+    "restrictiontypes": protectionEntries.map(restrictiontype)
+  }
+}
+
 async function testMobileView() {
     const url = "https://en.wikipedia.org/w/api.php?action=mobileview&format=json&page=Dog&sections=all&prop=text%7Csections%7Clanguagecount%7Cthumb%7Cimage%7Cid%7Crevision%7Cdescription%7Cnamespace%7Cnormalizedtitle%7Cdisplaytitle%7Cprotection%7Ceditable&sectionprop=toclevel%7Cline%7Canchor&noheadings=1&thumbwidth=1024&origin=*"
-    const meta = {
-      domain: "en.wikipedia.org",
-      baseURI: "http://localhost:6927/en.wikipedia.org/v1/",
-      mw
-    }
     const response = await fetch(url)
     const mobileViewJSON = await response.json()
-    const mobileHTML = convertMobileViewJSONToMobileHTML(mobileViewJSON, meta)
+    const domain = "en.wikipedia.org"
+    const baseURI = "http://localhost:6927/en.wikipedia.org/v1/"
+    const mobileHTML = convertMobileViewJSONToMobileHTML(mobileViewJSON, domain, baseURI)
     return mobileHTML
 }
 
