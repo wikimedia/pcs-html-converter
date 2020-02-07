@@ -32,7 +32,7 @@ function convertMobileViewJSONToMobileHTML(mobileViewJSON, domain, baseURI) {
     return convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
 }
 
-function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON) {
+function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, baseURI) {
     function getSectionHTML(section) {
         return "<section data-mw-section-id=\"" + section.id + "\">" + section.text + "</section>"
     }
@@ -40,18 +40,19 @@ function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON) {
         return acc + "\n" + getSectionHTML(curr)
     }
     const parsoidHTML = remainingJSON.sections.reduce(reducer, getSectionHTML(leadJSON.sections[0]))
-    const meta = {
-        mw: {
-            pageid: leadJSON.id,
-            ns: leadJSON.ns,
-            displaytitle: leadJSON.displaytitle,
-            protection: [],
-            description: leadJSON.description,
-            description_source: leadJSON.description_source
-
-        }
+    const metadata = {
+      domain,
+      baseURI,
+      mw: {
+          pageid: leadJSON.id,
+          ns: leadJSON.ns,
+          displaytitle: leadJSON.displaytitle,
+          protection: [],
+          description: leadJSON.description,
+          description_source: leadJSON.description_source
+      }
     }
-    return convertParsoidHTMLToMobileHTML(parsoidHTML, meta)
+    return convertParsoidHTMLToMobileHTML(parsoidHTML, metadata)
 }
 //  *   {!array} protection
 //  *   {?Object} originalimage
