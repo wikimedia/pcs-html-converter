@@ -32,6 +32,13 @@ function convertMobileViewJSONToMobileHTML(mobileViewJSON, domain, baseURI) {
     return convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
 }
 
+/**
+ * Converts mobile-sections JSON into mobile-html
+ * @param {object} leadJSON - The /mobile-sections/lead response
+ * @param {object} remainingJSON - The /mobile-sections/remaining response
+ * @param {string} domain - The page domain
+ * @param {string} baseURI - The baseURI for mobileapps services calls
+ */
 function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, baseURI) {
     function getSectionHTML(section) {
         return "<section data-mw-section-id=\"" + section.id + "\">" + section.text + "</section>"
