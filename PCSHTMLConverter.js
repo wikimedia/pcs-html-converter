@@ -113,15 +113,13 @@ async function testParsoid() {
 async function testMobileSections() {
     const leadURL = "https://en.wikipedia.org/api/rest_v1/page/mobile-sections-lead/Dog"
     const remainingURL = "https://en.wikipedia.org/api/rest_v1/page/mobile-sections-remaining/Dog"
-    const meta = {
-      baseURI: "http://localhost:6927/en.wikipedia.org/v1/",
-      mw
-    }
+    const domain = "en.wikipedia.org"
+    const baseURI = "http://localhost:6927/en.wikipedia.org/v1/"
     const leadResponse = await fetch(leadURL)
     const remainingResponse = await fetch(remainingURL)
     const leadJSON = await leadResponse.json()
     const remainingJSON = await remainingResponse.json()
-    const mobileHTML = convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, meta)
+    const mobileHTML = convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, baseURI)
     return mobileHTML
 }
 
