@@ -41,7 +41,7 @@ function convertMobileViewJSONToMobileHTML(mobileViewJSON, domain, baseURI) {
  */
 function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, baseURI) {
     function getSectionHTML(section) {
-        return "<section data-mw-section-id=\"" + section.id + "\">" + section.text + "</section>"
+        return "<section data-mw-section-id=\"" + section.id + "\">" + "<h" + section.toclevel + " id=" + section.anchor + ">" + section.line + "</h" + section.toclevel + ">" + section.text + "</section>"
     }
     function reducer(acc, curr) {
         return acc + "\n" + getSectionHTML(curr)
