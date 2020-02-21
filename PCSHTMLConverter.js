@@ -59,7 +59,13 @@ function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, 
           description_source: leadJSON.description_source
       }
     }
-    return convertParsoidHTMLToMobileHTML(parsoidHTML, metadata)
+    var html = convertParsoidHTMLToMobileHTML(parsoidHTML, metadata)
+    // If we have a receiver interface for receiving the converted HTML, then pass the content to it.
+    if (conversionClient) {
+        conversionClient.onReceiveHtml(html)
+        return;
+    }
+    return html;
 }
 //  *   {!array} protection
 //  *   {?Object} originalimage
