@@ -47,6 +47,11 @@ function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, 
         return acc + "\n" + getSectionHTML(curr)
     }
     const parsoidHTML = remainingJSON.sections.reduce(reducer, getSectionHTML(leadJSON.sections[0]))
+    const leadImage = {
+            "source": leadJSON.image.urls['640'],
+            "width": 640,
+            "height": 640,
+     }
     const metadata = {
       domain,
       baseURI,
@@ -54,9 +59,7 @@ function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, 
           pageid: leadJSON.id,
           ns: leadJSON.ns,
           displaytitle: leadJSON.displaytitle,
-          originalimage: leadJSON.image.urls['640'],
-          width: 640,
-          height: 640,
+          originalimage: leadImage,
           protection: [],
           description: leadJSON.description,
           description_source: leadJSON.description_source
