@@ -46,30 +46,39 @@ function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, 
     function reducer(acc, curr) {
         return acc + "\n" + getSectionHTML(curr)
     }
-    const parsoidHTML = remainingJSON.sections.reduce(reducer, getSectionHTML(leadJSON.sections[0]))
-    const leadImage = {
-            "source": leadJSON.image.urls['640'],
+    let html;
+    try {
+        const parsoidHTML = remainingJSON.sections.reduce(reducer, getSectionHTML(leadJSON.sections[0]))
+        const leadImage = {
+            "source": leadJSON.image && leadJSON.image.urls ? leadJSON.image.urls['640'] : "",
             "width": 640,
             "height": 640,
-     }
-    const metadata = {
-      domain,
-      baseURI,
-      mw: {
-          pageid: leadJSON.id,
-          ns: leadJSON.ns,
-          displaytitle: leadJSON.displaytitle,
-          originalimage: leadImage,
-          protection: [],
-          description: leadJSON.description,
-          description_source: leadJSON.description_source
-      }
-    }
-    var html = convertParsoidHTMLToMobileHTML(parsoidHTML, metadata)
-    // If we have a receiver interface for receiving the converted HTML, then pass the content to it.
-    if (conversionClient) {
-        conversionClient.onReceiveHtml(html)
-        return;
+        }
+        const metadata = {
+            domain,
+            baseURI,
+            mw: {
+                pageid: leadJSON.id,
+                ns: leadJSON.ns,
+                displaytitle: leadJSON.displaytitle,
+                originalimage: leadImage,
+                protection: [],
+                description: leadJSON.description,
+                description_source: leadJSON.description_source
+            }
+        }
+        html = convertParsoidHTMLToMobileHTML(parsoidHTML, metadata)
+        // If we have a receiver interface for receiving the converted HTML, then pass the content to it.
+        if (conversionClient) {
+            conversionClient.onReceiveHtml(html)
+            return;
+        }
+    } catch (err) {
+        console.log(err)
+        if (conversionClient) {
+            conversionClient.onError(err.message)
+            return;
+        }
     }
     return html;
 }
