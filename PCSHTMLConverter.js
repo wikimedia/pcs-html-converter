@@ -1,8 +1,14 @@
 const MobileHTML = require('./mobileapps/lib/mobile/MobileHTML')
 const MobileViewHTML = require('./mobileapps/lib/mobile/MobileViewHTML')
+const Banana = require('banana-i18n')
+const allLocales = require('./all.json')
+const allLocalesBanana = new Banana('en')
+allLocalesBanana.load(allLocales)
 
 function convertParsoidDocumentToMobileHTML(doc, metadata = {}) {
-    const mobileHTML = new MobileHTML(doc, metadata)
+    const locale = metadata.locale || metadata.domain.split('.')[0] || 'en'
+    allLocalesBanana.setLocale(locale)
+    const mobileHTML = new MobileHTML(doc, metadata, MobileHTML.OutputMode.contentAndReferences, allLocalesBanana)
     mobileHTML.workSync()
     mobileHTML.finalizeSync()
     if (metadata.mw) {
