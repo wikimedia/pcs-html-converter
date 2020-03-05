@@ -35,7 +35,7 @@ function convertMobileViewJSONToMobileHTML(mobileViewJSON, domain, baseURI) {
     // for some reason this is expected in both the param and in the metadata obj
     metadata.mobileview = mobileView
     const parsoidDocument = MobileViewHTML.convertToParsoidDocument(doc, mobileView, metadata)
-    return convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
+    return '<!DOCTYPE html>' + convertParsoidDocumentToMobileHTML(parsoidDocument, metadata)
 }
 
 /**
@@ -88,54 +88,6 @@ function convertMobileSectionsJSONToMobileHTML(leadJSON, remainingJSON, domain, 
     }
     return html;
 }
-//  *   {!array} protection
-//  *   {?Object} originalimage
-//  *   {!string} displaytitle
-//  *   {?string} description
-//  *   {?string} description_source
-const mw = {
-    "pageid": 4269567,
-    "ns": 0,
-    "title": "Dog",
-    "displaytitle": "Dog",
-    "contentmodel": "wikitext",
-    "pagelanguage": "en",
-    "pagelanguagehtmlcode": "en",
-    "pagelanguagedir": "ltr",
-    "touched": "2019-12-06T03:48:17Z",
-    "lastrevid": 929485161,
-    "length": 126950,
-    "protection": [
-        {
-            "type": "edit",
-            "level": "autoconfirmed",
-            "expiry": "infinity"
-        },
-        {
-            "type": "move",
-            "level": "sysop",
-            "expiry": "infinity"
-        }
-    ],
-    "restrictiontypes": [
-        "edit",
-        "move"
-    ],
-    "description": "domestic animal",
-    "description_source": "central"
-}
-
-async function testParsoid() {
-    const url = "https://en.wikipedia.org/api/rest_v1/page/html/Dog"
-    const meta = {
-      baseURI: "http://localhost:6927/en.wikipedia.org/v1/",
-      mw
-    }
-    const response = await fetch(url)
-    const parsoidHTML = await response.text()
-    const mobileHTML = convertParsoidHTMLToMobileHTML(parsoidHTML, meta)
-    return mobileHTML
-}
 
 async function testMobileSections() {
     const leadURL = "https://en.wikipedia.org/api/rest_v1/page/mobile-sections-lead/Dog"
@@ -165,6 +117,7 @@ function mwMetadataFromMobileViewJSON(mobileViewJSON) {
     "pageid": mobileViewJSON.mobileview.id,
     "ns": mobileViewJSON.mobileview.ns,
     "displaytitle": mobileViewJSON.mobileview.displaytitle,
+    "normalizedtitle": mobileViewJSON.mobileview.normalizedtitle,
     "contentmodel": "wikitext",
     "touched": mobileViewJSON.mobileview.lastmodified,
     "lastrevid": mobileViewJSON.mobileview.revision,
@@ -177,7 +130,7 @@ function mwMetadataFromMobileViewJSON(mobileViewJSON) {
 }
 
 async function testMobileView() {
-    const url = "https://en.wikipedia.org/w/api.php?action=mobileview&format=json&page=Dog&sections=all&prop=text%7Csections%7Clanguagecount%7Cthumb%7Cimage%7Cid%7Crevision%7Cdescription%7Cnamespace%7Cnormalizedtitle%7Cdisplaytitle%7Cprotection%7Ceditable&sectionprop=toclevel%7Cline%7Canchor&noheadings=1&thumbwidth=1024&origin=*"
+    const url = "https://zh.wikipedia.org/w/api.php?action=mobileview&format=json&page=中國&sections=all&prop=text%7Csections%7Clanguagecount%7Cthumb%7Cimage%7Cid%7Crevision%7Cdescription%7Cnamespace%7Cnormalizedtitle%7Cdisplaytitle%7Cprotection%7Ceditable&sectionprop=toclevel%7Cline%7Canchor&noheadings=1&thumbwidth=1024&origin=*"
     const response = await fetch(url)
     const mobileViewJSON = await response.json()
     const domain = "en.wikipedia.org"
@@ -190,7 +143,6 @@ module.exports = {
     convertParsoidHTMLToMobileHTML,
     convertMobileSectionsJSONToMobileHTML,
     convertMobileViewJSONToMobileHTML,
-    testParsoid,
     testMobileView,
     testMobileSections
 }
