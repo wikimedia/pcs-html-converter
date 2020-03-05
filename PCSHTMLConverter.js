@@ -154,6 +154,13 @@ function mwMetadataFromMobileViewJSON(mobileViewJSON) {
   const protectionEntries = Object.entries(mobileViewJSON.mobileview.protection || {})
   const protection = e => { return { type: e[0], level: e[1][0], expiry: 'infinity' } }
   const restrictiontype = e => e[0]
+	const imageURL = mobileViewJSON.mobileview.imageURL;
+	const leadImage = {
+			"source": imageURL,
+			"width": null,
+			"height": null
+	}
+	var originalimage = imageURL == undefined ? null : leadImage;
   return {
     "pageid": mobileViewJSON.mobileview.id,
     "ns": mobileViewJSON.mobileview.ns,
@@ -163,6 +170,7 @@ function mwMetadataFromMobileViewJSON(mobileViewJSON) {
     "lastrevid": mobileViewJSON.mobileview.revision,
     "description": mobileViewJSON.mobileview.description,
     "description_source": mobileViewJSON.mobileview.descriptionsource,
+    "originalimage": originalimage,
     "protection": protectionEntries.map(protection),
     "restrictiontypes": protectionEntries.map(restrictiontype)
   }
